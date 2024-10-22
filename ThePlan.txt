@@ -1,0 +1,7 @@
+Goal: Create an IP scanner that runs off a "webserver" that can be accessed through a HTTP socket. This IP scanner will check for open ports on a specific IP or scan for all IPs that can be pinged on a network. 
+
+Process:
+Create a sketchy HTTP socket that can receive packets from another computer on the same network
+Create a menu to select what the users wants to do and connects them with the correct functionality
+Create a port scanner
+Create a ping function for a desired subnet
