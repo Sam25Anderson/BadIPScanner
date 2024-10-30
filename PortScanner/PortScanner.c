@@ -1,54 +1,57 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
-int main(int argc, char *argv[])
-{
-	if (argc < 4)
-	{
-		printf("Please enter the server IP address"
-		       " and range of ports to be scanned\n");
-		printf("USAGE: %sd IPv4 First_Port Last_Port\n",
-		       argv[0]);
-		exit(1);
-	}
-	char tIP[16] = {0};
-	strcpy(tIP, argv[1]); // Copy the IPv4 address
-	char First_Port[6] = {0};
-	strcpy(First_Port, argv[2]); // Copy the start_port
-	char Last_Port[6] = {0};
-	strcpy(Last_Port, argv[3]); // Copy the end_port
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
-	// Start port-scanner
-	port_scanner(tIP, First_Port, Last_Port);
-	return 0;
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+
+#define TIMEOUT 1;
+
+int port_checker(const char *ip, int port){
+  int check_sock;
+  struct sockaddr_in server_address;
+
+  check_sock = socket(AF_INET, SOCK_STREAM, 0);
+  if (check_sock < 1){
+    printf("Socket was not created successfully");
+    return 0;
+  }
+
+  server_address.sin_family = AF_INET;
+  server_address.sin_port = htons(port);
+  inet_pton(AF_INET, ip, &server_address.sin_addr);
+
+  int  connection = connect(check_sock, (struct sockaddr*) &server_address, sizeof(server_address));
+  if (connection < 0){
+    // port is closed
+    close(check_sock);
+    return 0;
+    }
+  else{
+    // port is open
+    close(check_sock);
+    return 1;
+  }
+  close(check_sock);
+  return 0;
 }
 
+void scan_ports(const char *ip, int first_port, int last_port){
+  for (int port = first_port; port <= last_port; port++){
+    if(port_checker(ip, port) == 0){
+      printf("Port: %d is closed", port);
+    }
+    else{
+      printf("Port: %d is open", port);
+    }
+  }
 
-struct addrinfo hints;
-memset(&hints, 0, sizeof(hints));
-hints.ai_family = AF_INET;
-hins.ai_socktype = SOCK_STREAM;
 
-sockfd = socket(temp->ai_family, temp->ai_socktype,
-		temp->ai_protocol);
 
-if (sockfd < 0)
-{
-	printf("Port %d is NOT open.\n" port);
-	continue;
 }
-
-status = connect(sockfd, temp->ai_addr,
-		 temp->ai_addrlen);
-
-if (status<0)
-{
-	printf("Port %d is NOT open.\n" port);
-	close(sockfd);
-	continue;
-}
-
-printf("Port %d is open.\n", port);
-close(sockfd);
-
 
