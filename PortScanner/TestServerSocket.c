@@ -6,28 +6,18 @@
 #include <unistd.h>
 #include "PortChecker.h"
 
-#define PORT 10100
-
-void test_function(char *buffer, size_t size){
-  int offset = 0;
-  for (int i = 1; i < 10; i++){
-    offset += snprintf(buffer + offset, size - offset, "%d\n", i);
-    if (offset >= size){
-      break;
-    }
-  }
-}
+#define PORT 10200
 
 int main(int argc, char const* argv[]){
   int server_fd, new_socket;
   struct sockaddr_in address;
   socklen_t addrlen = sizeof(address);
   int opt = 1;
-  char buffer[1024] = {0};
+  char buffer[4096] = {0};
 
-  test_function(buffer, sizeof(buffer));
+  memset(buffer, 0, sizeof(buffer));
 
-  scan_ports("127.0.0.1", 1500, 1510);
+  scan_ports("127.0.0.1", 1500, 1510, buffer, sizeof(buffer));
 
   server_fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -47,6 +37,9 @@ int main(int argc, char const* argv[]){
 
   close(new_socket);
   close(server_fd);
+
+  printf("%s\n", buffer); // to test what the buffer holds
+
   return 0;
 }
 
