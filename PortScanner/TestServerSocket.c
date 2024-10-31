@@ -14,10 +14,11 @@ int main(int argc, char const* argv[]){
   socklen_t addrlen = sizeof(address);
   int opt = 1;
   char buffer[4096] = {0};
-
-  memset(buffer, 0, sizeof(buffer));
+  char buf_copy[4096];
 
   scan_ports("127.0.0.1", 1500, 1510, buffer, sizeof(buffer));
+
+  memcpy(buf_copy, buffer, strlen(buffer));
 
   server_fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -33,12 +34,12 @@ int main(int argc, char const* argv[]){
 
   new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen);
 
-  send(new_socket, buffer, strlen(buffer), 0);
+  send(new_socket, buf_copy, strlen(buf_copy), 0);
 
   close(new_socket);
   close(server_fd);
 
-  printf("%s\n", buffer); // to test what the buffer holds
+  printf("%s\n", buf_copy); // to test what the buffer holds
 
   return 0;
 }
